@@ -25,6 +25,7 @@ type Deej struct {
 	config   *CanonicalConfig
 	serial   *SerialIO
 	sessions *sessionMap
+	events   *eventHandler
 
 	stopChannel chan bool
 	version     string
@@ -77,6 +78,14 @@ func NewDeej(logger *zap.SugaredLogger, verbose bool) (*Deej, error) {
 
 	d.sessions = sessions
 
+	events, err := newEventHandler(d, logger)
+	if err != nil {
+		logger.Errorw("Failed to create eventMap", "error", err)
+		return nil, fmt.Errorf("create new eventMap: %w", err)
+	}
+
+	d.events = events
+
 	logger.Debug("Created deej instance")
 
 	return d, nil
@@ -96,6 +105,12 @@ func (d *Deej) Initialize() error {
 	if err := d.sessions.initialize(); err != nil {
 		d.logger.Errorw("Failed to initialize session map", "error", err)
 		return fmt.Errorf("init session map: %w", err)
+	}
+
+	// initialize the event handler
+	if err := d.events.initialize(); err != nil {
+		d.logger.Errorw("Failed to initialize event handler", "error", err)
+		return fmt.Errorf("init event handler: %w", err)
 	}
 
 	// decide whether to run with/without tray

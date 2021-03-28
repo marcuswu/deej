@@ -8,6 +8,7 @@ require (
 	github.com/getlantern/ops v0.0.0-20200403153110-8476b16edcd6 // indirect
 	github.com/getlantern/systray v0.0.0-20200324212034-d3ab4fd25d99
 	github.com/go-ole/go-ole v1.2.4
+	github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510
 	github.com/gopherjs/gopherjs v0.0.0-20200217142428-fce0ec30dd00 // indirect
 	github.com/jacobsa/go-serial v0.0.0-20180131005756-15cf729a72d4
 	github.com/jfreymuth/pulse v0.0.0-20200608153616-84b2d752b9d4
