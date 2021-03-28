@@ -8,19 +8,19 @@
 # important: slider indexes start at 0, regardless of which analog pins you're using!
 slider_mapping:
   0: master
-  1: chrome.exe
-  2: spotify.exe
-  3:
-    - pathofexile_x64.exe
-    - rocketleague.exe
-  4: discord.exe
+  1: Brave Browser
+  2: zoom.us
+  3: Discord
+
+event_mapping:
+  0: /Users/mwu/projects/ddcctl/bin/release/ddcctl -d 1 -i 15
 
 # set this to true if you want the controls inverted (i.e. top is 0%, bottom is 100%)
 invert_sliders: false
 
 # settings for connecting to the arduino board
-com_port: COM4
-baud_rate: 9600
+com_port: /dev/tty.usbserial-14440
+baud_rate: 115200
 
 # adjust the amount of signal noise reduction depending on your hardware quality
 # supported values are "low" (excellent hardware), "default" (regular hardware) or "high" (bad, noisy hardware)

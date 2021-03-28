@@ -32,7 +32,8 @@ type SerialIO struct {
 	lastKnownNumSliders        int
 	currentSliderPercentValues []float32
 
-	sliderMoveConsumers []chan SliderMoveEvent
+	sliderMoveConsumers  []chan SliderMoveEvent
+	eventNumberConsumers []chan NumberedEvent
 }
 
 // SliderMoveEvent represents a single slider move captured by deej
@@ -41,8 +42,13 @@ type SliderMoveEvent struct {
 	PercentValue float32
 }
 
+type NumberedEvent struct {
+	EventID int
+}
+
 var expectedLinePattern = regexp.MustCompile(`^\d{1,4}(\|\d{1,4})*\r\n$`)
 var maxRetryDelay = 100 * time.Second
+var expectedEventPattern = regexp.MustCompile(`^event:\d*\r\n$`)
 
 // NewSerialIO creates a SerialIO instance that uses the provided deej
 // instance's connection info to establish communications with the arduino chip
@@ -50,12 +56,13 @@ func NewSerialIO(deej *Deej, logger *zap.SugaredLogger) (*SerialIO, error) {
 	logger = logger.Named("serial")
 
 	sio := &SerialIO{
-		deej:                deej,
-		logger:              logger,
-		stopChannel:         make(chan bool),
-		connected:           false,
-		conn:                nil,
-		sliderMoveConsumers: []chan SliderMoveEvent{},
+		deej:                 deej,
+		logger:               logger,
+		stopChannel:          make(chan bool),
+		connected:            false,
+		conn:                 nil,
+		sliderMoveConsumers:  []chan SliderMoveEvent{},
+		eventNumberConsumers: []chan NumberedEvent{},
 	}
 
 	logger.Debug("Created serial i/o instance")
@@ -133,7 +140,8 @@ func (sio *SerialIO) Start() error {
 			case <-sio.stopChannel:
 				sio.close(namedLogger)
 			case line, ok := <-lineChannel:
-				sio.handleLine(namedLogger, line)
+				sio.handleEventLine(namedLogger, line)
+				sio.handleSliderLine(namedLogger, line)
 				if !ok {
 					sio.connected = false
 					sio.Start()
@@ -161,6 +169,13 @@ func (sio *SerialIO) Stop() {
 func (sio *SerialIO) SubscribeToSliderMoveEvents() chan SliderMoveEvent {
 	ch := make(chan SliderMoveEvent)
 	sio.sliderMoveConsumers = append(sio.sliderMoveConsumers, ch)
+
+	return ch
+}
+
+func (sio *SerialIO) SubscribeToNumberedEvent() chan NumberedEvent {
+	ch := make(chan NumberedEvent)
+	sio.eventNumberConsumers = append(sio.eventNumberConsumers, ch)
 
 	return ch
 }
@@ -246,7 +261,23 @@ func (sio *SerialIO) readLine(logger *zap.SugaredLogger, reader *bufio.Reader) c
 	return ch
 }
 
-func (sio *SerialIO) handleLine(logger *zap.SugaredLogger, line string) {
+func (sio *SerialIO) handleEventLine(logger *zap.SugaredLogger, line string) {
+	if !expectedEventPattern.MatchString(line) {
+		return
+	}
+
+	// trim the suffix
+	line = strings.TrimSuffix(line, "\r\n")
+	splitLine := strings.Split(line, ":")
+	eventNum := splitLine[len(splitLine)-1]
+	eventId, _ := strconv.Atoi(eventNum)
+
+	for _, consumer := range sio.eventNumberConsumers {
+		consumer <- NumberedEvent{eventId}
+	}
+}
+
+func (sio *SerialIO) handleSliderLine(logger *zap.SugaredLogger, line string) {
 
 	// this function receives an unsanitized line which is guaranteed to end with LF,
 	// but most lines will end with CRLF. it may also have garbage instead of
