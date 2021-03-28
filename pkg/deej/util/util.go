@@ -36,6 +36,11 @@ func Linux() bool {
 	return runtime.GOOS == "linux"
 }
 
+// Darwin returns true if we're running on OS X
+func Darwin() bool {
+	return runtime.GOOS == "darwin"
+}
+
 // SetupCloseHandler creates a 'listener' on a new goroutine which will notify the
 // program if it receives an interrupt from the OS
 func SetupCloseHandler() chan os.Signal {
