@@ -47,7 +47,7 @@ type NumberedEvent struct {
 }
 
 var expectedLinePattern = regexp.MustCompile(`^\d{1,4}(\|\d{1,4})*\r\n$`)
-var maxRetryDelay = 100 * time.Second
+var maxRetryDelay = 5 * time.Second
 var expectedEventPattern = regexp.MustCompile(`^event:\d*\r\n$`)
 
 // NewSerialIO creates a SerialIO instance that uses the provided deej
