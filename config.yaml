@@ -19,7 +19,7 @@ event_mapping:
 invert_sliders: false
 
 # settings for connecting to the arduino board
-com_port: /dev/tty.usbserial-14440
+com_port: /dev/tty.usbmodem144401
 baud_rate: 115200
 
 # adjust the amount of signal noise reduction depending on your hardware quality
