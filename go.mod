@@ -19,9 +19,10 @@ require (
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/mitchellh/go-ps v1.0.0
 	github.com/moutend/go-wca v0.1.2-0.20190422112502-0fa027b3d89a
-	github.com/progrium/macdriver v0.0.2
+	github.com/progrium/macdriver v0.2.0
 	github.com/spf13/viper v1.7.1
 	github.com/thoas/go-funk v0.7.0
 	go.uber.org/zap v1.15.0
+	golang.org/x/sys v0.0.0-20220708085239-5a0f0661e09d // indirect
 	gopkg.in/Knetic/govaluate.v3 v3.0.0 // indirect
 )
